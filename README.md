@@ -2,6 +2,8 @@
 
 A bridge between AI systems (via the Model Context Protocol) and Beckn's interoperable transaction networks.
 
+![Architecture Overview](./docs/assets/beckn-mcp-architecture.png)
+
 ## Project Overview
 
 This project implements a server that enables AI assistants to interact with real-world services through Beckn Protocol networks. It uses Model Context Protocol (MCP) to receive requests from AI models and Block's Goose framework for agent orchestration.
@@ -56,11 +58,27 @@ The system follows a modular architecture with clear separation of concerns:
 
 For more details, see the [Technical Proposal](./docs/technical-proposal.md).
 
+## Quick Demo
+
+```bash
+# Clone and start the project
+git clone https://github.com/yourusername/mcp-beckn.git
+cd mcp-beckn
+npm install
+npm run dev
+
+# In another terminal, test with a sample request:
+curl -X POST http://localhost:3000/mcp/v1 \
+  -H "Content-Type: application/json" \
+  -d '{"query": "Book me a cab from MG Road to the airport", "context": {"user_id": "user123"}}'
+```
+
 ## Development Roadmap
 
-- **Phase 1**: Basic MCP server with Beckn search capabilities
-- **Phase 2**: Full transaction lifecycle support (search, select, init, confirm)
-- **Phase 3**: Multi-domain support and advanced NLU
+- **Phase 1** (Current): Basic MCP server with Beckn search capabilities
+- **Phase 2** (Q2 2025): Full transaction lifecycle support (search, select, init, confirm)
+- **Phase 3** (Q3 2025): Multi-domain support and advanced NLU
+- **Phase 4** (Q4 2025): Production-ready implementation with real Beckn network integration
 
 ## Contributing
 

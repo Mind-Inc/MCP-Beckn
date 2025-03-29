@@ -13,6 +13,18 @@ Before you begin:
 
 ## How Can I Contribute?
 
+### Good First Issues
+
+Looking to make your first contribution? Here are some beginner-friendly issues to get started:
+
+- **Documentation Improvements**: Enhance our guides and examples
+- **Test Coverage**: Add test cases for edge scenarios
+- **NLU Enhancements**: Improve the intent extraction logic
+- **Domain Support**: Add support for additional Beckn domains
+- **UI Development**: Create a simple dashboard for visualizing requests/responses
+
+These issues are great for newcomers and don't require deep knowledge of all system components.
+
 ### Reporting Bugs
 
 - Check if the bug has already been reported in the [issue tracker](https://github.com/yourusername/mcp-beckn/issues)

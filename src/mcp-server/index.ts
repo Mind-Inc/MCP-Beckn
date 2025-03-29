@@ -1,5 +1,5 @@
 import express from 'express';
-import { IntentMapper } from '../intent-mapper';
+import { IntentMapper, KeywordIntentMapper, LLMIntentMapper, ExampleOpenAIService } from '../intent-mapper';
 import { GooseOrchestrator } from '../goose-orchestrator';
 
 export class MCPServer {
@@ -8,9 +8,15 @@ export class MCPServer {
   private intentMapper: IntentMapper;
   private orchestrator: GooseOrchestrator;
 
-  constructor(port: number = 3000) {
+  constructor(port: number = 3000, intentMapper?: IntentMapper) {
     this.port = port;
-    this.intentMapper = new IntentMapper();
+    
+    // Use the provided intent mapper or create a default one
+    // For production, you'd use the LLM implementation:
+    // const llmService = new ExampleOpenAIService(process.env.OPENAI_API_KEY || '');
+    // this.intentMapper = new LLMIntentMapper(llmService);
+    this.intentMapper = intentMapper || new KeywordIntentMapper();
+    
     this.orchestrator = new GooseOrchestrator();
     this.setupMiddleware();
     this.setupRoutes();

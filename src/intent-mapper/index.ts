@@ -2,8 +2,12 @@
  * Intent Mapper
  * 
  * Maps natural language queries to structured Beckn intents.
- * In a production system, this would likely use NLU or an LLM for more sophisticated mapping.
+ * Provides both simple keyword-based matching and LLM-powered intent parsing.
  */
+
+export interface IntentMapper {
+  mapQueryToIntent(query: string, context: Record<string, any>): Promise<Intent | null>;
+}
 
 export interface Intent {
   domain: string;
@@ -12,7 +16,100 @@ export interface Intent {
   context: Record<string, any>;
 }
 
-export class IntentMapper {
+export interface LLMService {
+  parseIntent(query: string): Promise<{
+    domain?: string;
+    operation?: string;
+    parameters?: Record<string, any>;
+  } | null>;
+}
+
+export class LLMIntentMapper implements IntentMapper {
+  private llmService: LLMService;
+
+  constructor(llmService: LLMService) {
+    this.llmService = llmService;
+  }
+
+  async mapQueryToIntent(query: string, context: Record<string, any>): Promise<Intent | null> {
+    try {
+      // Use LLM to parse the intent
+      const result = await this.llmService.parseIntent(query);
+      
+      if (!result || !result.domain) {
+        return null;
+      }
+      
+      return {
+        domain: result.domain,
+        operation: result.operation || 'search',
+        parameters: result.parameters || {},
+        context
+      };
+    } catch (error) {
+      console.error('Error parsing intent with LLM:', error);
+      return null;
+    }
+  }
+}
+
+// Example LLM Service implementation using fetch
+export class ExampleOpenAIService implements LLMService {
+  private apiKey: string;
+  private apiEndpoint: string;
+
+  constructor(apiKey: string, apiEndpoint = 'https://api.openai.com/v1/chat/completions') {
+    this.apiKey = apiKey;
+    this.apiEndpoint = apiEndpoint;
+  }
+
+  async parseIntent(query: string): Promise<{ domain?: string; operation?: string; parameters?: Record<string, any>; } | null> {
+    try {
+      const response = await fetch(this.apiEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-3.5-turbo',
+          messages: [
+            {
+              role: 'system',
+              content: 'You are an intent parsing assistant. Extract domain, operation, and parameters from user queries.'
+            },
+            {
+              role: 'user',
+              content: `Parse this query into a JSON object with domain (mobility, retail, food), operation (search, select, init, confirm), and parameters: "${query}"`
+            }
+          ],
+          temperature: 0.1
+        })
+      });
+
+      const data = await response.json();
+      const resultText = data.choices[0]?.message?.content;
+
+      if (!resultText) {
+        return null;
+      }
+
+      // Extract JSON from the response
+      const jsonMatch = resultText.match(/\{[\s\S]*\}/m);
+      if (!jsonMatch) {
+        return null;
+      }
+
+      return JSON.parse(jsonMatch[0]);
+    } catch (error) {
+      console.error('Error calling LLM API:', error);
+      return null;
+    }
+  }
+}
+
+// Default implementation using keyword matching
+export class KeywordIntentMapper implements IntentMapper {
   private domains = {
     mobility: ['cab', 'taxi', 'ride', 'transportation', 'drive', 'car', 'auto', 'rickshaw'],
     retail: ['shop', 'buy', 'purchase', 'order', 'shopping', 'product', 'item'],

@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  mcp-beckn:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+      - BECKN_MOBILITY_GATEWAY=https://beckn-mobility-gateway.example.com
+      - BECKN_RETAIL_GATEWAY=https://beckn-retail-gateway.example.com
+      - BECKN_FOOD_GATEWAY=https://beckn-food-gateway.example.com
+    restart: unless-stopped

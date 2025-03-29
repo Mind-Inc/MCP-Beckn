@@ -32,6 +32,35 @@ This document outlines a technical architecture for integrating Beckn Protocol w
 
 ### Data Flow
 
+```
+sequenceDiagram
+    participant User
+    participant AI as AI Assistant
+    participant MCP as MCP Server
+    participant Intent as Intent Mapper
+    participant Goose as Goose Orchestrator
+    participant Beckn as Beckn Client
+    participant Network as Beckn Network
+    participant Provider as Service Provider
+
+    User->>AI: "Book me a cab to the airport"
+    AI->>MCP: MCP Request {query, context}
+    MCP->>Intent: mapQueryToIntent(query, context)
+    Intent->>MCP: Intent {domain: mobility, operation: search, parameters: {...}}
+    MCP->>Goose: execute(intent)
+    Goose->>Beckn: search(domain, parameters)
+    Beckn->>Network: Beckn Search Request
+    Network->>Provider: Forward Search Request
+    Provider->>Network: Provider Response
+    Network->>Beckn: Beckn Search Response
+    Beckn->>Goose: Search Results
+    Goose->>MCP: Workflow Result
+    MCP->>AI: MCP Response {options, conversation_context}
+    AI->>User: "I found these ride options..."
+```
+
+The flow consists of these key steps:
+
 1. User expresses intent to an AI assistant ("Book me a cab to the airport")
 2. AI sends an MCP request to the MCP Server
 3. Intent Mapper identifies this as a mobility request and extracts parameters
