@@ -34,13 +34,13 @@ flowchart TD
 
 ## Project Overview
 
-This project implements a server that enables AI assistants to interact with real-world services through Beckn Protocol networks. It uses Model Context Protocol (MCP) to receive requests from AI models and Block's Goose framework for agent orchestration.
+This project implements a server that enables AI assistants to interact with real-world services through Beckn Protocol networks. It uses Model Context Protocol (MCP) to receive requests from AI models and supports pluggable orchestration frameworks.
 
 ### Key Components
 
 - **MCP Server**: Handles MCP protocol requests from AI systems
 - **Intent Mapper**: Translates natural language intents to Beckn operations
-- **Goose Orchestrator**: Manages workflows and tools
+- **Orchestration Layer**: Manages workflows with pluggable engines (Goose, MindNet, etc.)
 - **Beckn Client**: Interacts with Beckn networks following the protocol
 
 ## Getting Started
@@ -81,10 +81,34 @@ The system follows a modular architecture with clear separation of concerns:
 
 1. AI assistants send requests via MCP
 2. Intent mapping transforms natural language to structured intents
-3. Goose orchestration manages the transaction workflow
+3. Pluggable orchestration manages the transaction workflow
 4. Beckn client handles protocol-specific operations
 
 For more details, see the [Technical Proposal](./docs/technical-proposal.md).
+
+## Orchestration Engines
+
+The system supports multiple orchestration engines that can be configured via the `ORCHESTRATOR_TYPE` environment variable:
+
+- **Goose** (default): Block's workflow orchestration framework
+- **MindNet**: Memory-persistent, Knowledge Graph-driven orchestration (placeholder)
+- **LangGraph**: LangChain's graph-based workflow engine (placeholder)
+- **Custom**: Create and plug in your own orchestration engine
+
+To create your own orchestrator:
+
+```bash
+# Generate boilerplate for a new orchestrator
+node scripts/create-orchestrator.js MyOrchestrator
+
+# Configure to use it
+echo "ORCHESTRATOR_TYPE=my-orchestrator" >> .env
+
+# Run with your custom orchestrator
+npm run dev
+```
+
+See [Custom Orchestrators Guide](./docs/custom-orchestrators.md) for detailed instructions.
 
 ## Quick Demo
 

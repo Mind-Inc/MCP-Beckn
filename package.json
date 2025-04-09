@@ -7,7 +7,11 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "ts-node src/index.ts",
-    "test": "jest"
+    "test": "jest",
+    "shell": "ts-node tools/mcp-shell-server.ts",
+    "dashboard": "npx serve tools/test-dashboard",
+    "create-orchestrator": "node scripts/create-orchestrator.js",
+    "generate": "node scripts/create-orchestrator.js"
   },
   "keywords": [
     "beckn",
@@ -20,15 +24,21 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2"
+    "ajv": "^8.12.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "serve": "^14.2.1",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.11",
     "@types/node": "^20.10.5",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.3.3",
+    "@types/uuid": "^9.0.7",
     "jest": "^29.7.0",
     "ts-jest": "^29.1.1",
-    "@types/jest": "^29.5.11"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
   }
 }

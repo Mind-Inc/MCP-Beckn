@@ -1,6 +1,6 @@
 # Beckn-MCP Integration: Overview
 
-This project connects AI assistants to real-world services through Beckn Protocol networks using Anthropic's Model Context Protocol (MCP) and Block's Goose orchestration framework.
+This project connects AI assistants to real-world services through Beckn Protocol networks using Anthropic's Model Context Protocol (MCP) and a pluggable orchestration framework.
 
 ## What Problem Does This Solve?
 
@@ -20,7 +20,7 @@ By integrating MCP with Beckn Protocol:
 1. **User to AI**: The user expresses their intent in natural language
 2. **AI to MCP Server**: The AI sends a structured MCP request
 3. **Intent Mapping**: Natural language is converted to structured Beckn operations
-4. **Goose Orchestration**: Complex workflows are managed across multiple steps
+4. **Orchestration**: Complex workflows are managed across multiple steps (supports multiple engines)
 5. **Beckn Client**: The system communicates with appropriate Beckn networks
 6. **Service Fulfillment**: Beckn networks connect with actual service providers
 
@@ -31,6 +31,8 @@ By integrating MCP with Beckn Protocol:
 - **Conversation Context**: Maintains state across multi-step transactions
 - **LLM-Powered Intent Mapping**: Option to use advanced NLU via LLMs
 - **Modular Architecture**: Components can be replaced or upgraded independently
+- **Pluggable Orchestration**: Support for different orchestration engines (Goose, MindNet, etc.)
+- **Testing Tools**: MCP shell server, testing dashboard, and validation utilities
 
 ## Current Status
 
@@ -38,17 +40,18 @@ This project is a functional prototype demonstrating the integration concept. It
 
 - MCP server implementation with proper request/response handling
 - Intent mapping for mobility, retail, and food domains
-- Mock implementation of Goose orchestration framework
+- Orchestration abstraction with pluggable engines
 - Simplified Beckn client with domain-specific request generation
 - Comprehensive documentation and examples
+- Testing utilities and simulation tools
 
 ## Next Steps
 
-1. **Integration with actual Goose framework** from Block
-2. **Real-world testing** with specific Beckn networks
-3. **Enhanced NLU** for more sophisticated intent parsing
-4. **Production deployment** with monitoring and scaling
-5. **Community-driven enhancements** for additional domains
+1. **Real-world testing** with specific Beckn networks
+2. **Enhanced NLU** for more sophisticated intent parsing
+3. **Production deployment** with monitoring and scaling
+4. **Community-driven enhancements** for additional domains
+5. **Implementation of additional orchestration engines**
 
 ## Contributing
 
@@ -72,4 +75,6 @@ curl -X POST http://localhost:3000/mcp/v1 \
 - [Technical Proposal](./docs/technical-proposal.md): Detailed architecture and rationale
 - [Implementation Guide](./docs/implementation-guide.md): Technical details for developers
 - [Developer Quickstart](./docs/developer-quickstart.md): Get up and running quickly
-- [MCP-Goose-Beckn Integration](./docs/mcp-goose-beckn-integration.md): How the three technologies work together
+- [MCP-Goose-Beckn Integration](./docs/mcp-goose-beckn-integration.md): How the technologies work together
+- [Custom Orchestrators](./docs/custom-orchestrators.md): Creating your own orchestration engines
+- [Testing with Shell Server](./docs/testing/shell-server.md): Using the MCP Shell for testing

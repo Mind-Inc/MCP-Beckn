@@ -4,6 +4,7 @@
 
 import { MCPServer } from './mcp-server';
 import { KeywordIntentMapper, LLMIntentMapper, ExampleOpenAIService } from './intent-mapper';
+import { OrchestratorFactory } from './orchestrator/factory';
 
 // Choose the intent mapper based on environment
 let intentMapper;
@@ -18,8 +19,12 @@ if (process.env.USE_LLM === 'true' && process.env.OPENAI_API_KEY) {
   intentMapper = new KeywordIntentMapper();
 }
 
-// Initialize the MCP server with the chosen intent mapper
-const server = new MCPServer(Number(process.env.PORT) || 3000, intentMapper);
+// Create orchestrator based on environment configuration
+const orchestrator = OrchestratorFactory.createOrchestrator(process.env.ORCHESTRATOR_TYPE);
+console.log(`Using orchestrator: ${process.env.ORCHESTRATOR_TYPE || 'goose'}`);
+
+// Initialize the MCP server with the chosen components
+const server = new MCPServer(Number(process.env.PORT) || 3000, intentMapper, orchestrator);
 
 // Start the server
 server.start();

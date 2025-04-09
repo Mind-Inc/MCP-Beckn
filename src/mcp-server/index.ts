@@ -1,14 +1,15 @@
 import express from 'express';
 import { IntentMapper, KeywordIntentMapper, LLMIntentMapper, ExampleOpenAIService } from '../intent-mapper';
-import { GooseOrchestrator } from '../goose-orchestrator';
+import { Orchestrator } from '../orchestrator';
+import { OrchestratorFactory } from '../orchestrator/factory';
 
 export class MCPServer {
   private app = express();
   private port: number;
   private intentMapper: IntentMapper;
-  private orchestrator: GooseOrchestrator;
+  private orchestrator: Orchestrator;
 
-  constructor(port: number = 3000, intentMapper?: IntentMapper) {
+  constructor(port: number = 3000, intentMapper?: IntentMapper, orchestrator?: Orchestrator) {
     this.port = port;
     
     // Use the provided intent mapper or create a default one
@@ -17,7 +18,9 @@ export class MCPServer {
     // this.intentMapper = new LLMIntentMapper(llmService);
     this.intentMapper = intentMapper || new KeywordIntentMapper();
     
-    this.orchestrator = new GooseOrchestrator();
+    // Use the provided orchestrator or create one from the factory
+    this.orchestrator = orchestrator || OrchestratorFactory.createOrchestrator();
+    
     this.setupMiddleware();
     this.setupRoutes();
   }
@@ -62,7 +65,7 @@ export class MCPServer {
         });
       }
       
-      // Use Goose to orchestrate the workflow
+      // Use the configured orchestrator to execute the workflow
       const result = await this.orchestrator.execute(intent);
       
       // Return result in MCP-compatible format

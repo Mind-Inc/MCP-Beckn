@@ -1,0 +1,27 @@
+flowchart TD
+    User[User] --> |Natural Language Request| AI[AI Assistant]
+    AI --> |MCP Request| MCP[MCP Server]
+    
+    subgraph "Beckn-MCP Integration"
+        MCP --> Intent[Intent Mapper]
+        Intent --> |Structured Intent| Goose[Goose Orchestrator]
+        Goose --> |Tool Execution| Beckn[Beckn Client]
+    end
+    
+    Beckn --> |Protocol Request| BN[Beckn Network]
+    BN --> |Domain Requests| Providers[Service Providers]
+    
+    Providers --> |Service Response| BN
+    BN --> |Protocol Response| Beckn
+    Beckn --> |Results| Goose
+    Goose --> |Workflow Result| MCP
+    MCP --> |MCP Response| AI
+    AI --> |Natural Language Response| User
+    
+    class User,AI,Providers external
+    class MCP,Intent,Goose,Beckn primary
+    class BN secondary
+
+    classDef external fill:#f9f9f9,stroke:#333,stroke-width:1px
+    classDef primary fill:#d8e8f4,stroke:#0066cc,stroke-width:1px
+    classDef secondary fill:#e8f4d8,stroke:#339900,stroke-width:1px

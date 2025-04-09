@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCP-Beckn Testing Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .json-display {
+      background-color: #f8f9fa;
+      border-radius: 4px;
+      padding: 10px;
+      font-family: monospace;
+      white-space: pre-wrap;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .nav-tabs {
+      margin-bottom: 20px;
+    }
+    .tab-content {
+      padding: 15px;
+      border: 1px solid #dee2e6;
+      border-top: none;
+      border-radius: 0 0 5px 5px;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-dark bg-dark">
+    <div class="container">
+      <span class="navbar-brand mb-0 h1">MCP-Beckn Testing Dashboard</span>
+    </div>
+  </nav>
+
+  <div class="container mt-4">
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="mcp-tab" data-bs-toggle="tab" data-bs-target="#mcp" type="button" role="tab">MCP Tester</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="transactions-tab" data-bs-toggle="tab" data-bs-target="#transactions" type="button" role="tab">Transactions</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab">Settings</button>
+      </li>
+    </ul>
+    
+    <div class="tab-content" id="myTabContent">
+      <!-- MCP Tester Tab -->
+      <div class="tab-pane fade show active" id="mcp" role="tabpanel">
+        <h4>Send MCP Request</h4>
+        <form id="mcpForm">
+          <div class="mb-3">
+            <label for="mcpEndpoint" class="form-label">MCP Endpoint</label>
+            <input type="text" class="form-control" id="mcpEndpoint" value="http://localhost:3001/mcp/v1">
+          </div>
+          
+          <div class="mb-3">
+            <label for="mcpQuery" class="form-label">Query</label>
+            <textarea class="form-control" id="mcpQuery" rows="3" placeholder="Book me a cab from MG Road to the airport"></textarea>
+          </div>
+          
+          <div class="mb-3">
+            <label for="mcpContext" class="form-label">Context (JSON)</label>
+            <textarea class="form-control" id="mcpContext" rows="3" placeholder='{"user_id": "user123"}'></textarea>
+          </div>
+          
+          <button type="submit" class="btn btn-primary">Send Request</button>
+        </form>
+        
+        <div class="row mt-4">
+          <div class="col-12">
+            <h5>Response</h5>
+            <div id="mcpResponse" class="json-display">No response yet</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Transactions Tab -->
+      <div class="tab-pane fade" id="transactions" role="tabpanel">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4>Recent Transactions</h4>
+          <button id="refreshTransactions" class="btn btn-outline-secondary">Refresh</button>
+        </div>
+        
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Transaction ID</th>
+                <th>Domain</th>
+                <th>State</th>
+                <th>Created</th>
+                <th>Updated</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="transactionsList">
+              <tr>
+                <td colspan="6" class="text-center">Loading transactions...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="row mt-4">
+          <div class="col-12">
+            <h5>Transaction Details</h5>
+            <div id="transactionDetails" class="json-display">Select a transaction to view details</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Settings Tab -->
+      <div class="tab-pane fade" id="settings" role="tabpanel">
+        <h4>Configuration</h4>
+        <form id="settingsForm">
+          <div class="mb-3">
+            <label for="transactionsEndpoint" class="form-label">Transactions Endpoint</label>
+            <input type="text" class="form-control" id="transactionsEndpoint" value="http://localhost:3001/transactions">
+          </div>
+          
+          <div class="mb-3">
+            <label for="refreshRate" class="form-label">Auto-refresh Rate (seconds)</label>
+            <input type="number" class="form-control" id="refreshRate" min="0" value="30">
+            <div class="form-text">Set to 0 to disable auto-refresh</div>
+          </div>
+          
+          <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="prettyPrintJson" checked>
+            <label class="form-check-label" for="prettyPrintJson">Pretty-print JSON</label>
+          </div>
+          
+          <button type="submit" class="btn btn-primary">Save Settings</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Transaction Modal -->
+  <div class="modal fade" id="transactionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Transaction Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="modalTransactionDetails" class="json-display"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Load settings from localStorage
+    function loadSettings() {
+      const settings = JSON.parse(localStorage.getItem('mcpDashboardSettings') || '{}');
+      if (settings.mcpEndpoint) document.getElementById('mcpEndpoint').value = settings.mcpEndpoint;
+      if (settings.transactionsEndpoint) document.getElementById('transactionsEndpoint').value = settings.transactionsEndpoint;
+      if (settings.refreshRate !== undefined) document.getElementById('refreshRate').value = settings.refreshRate;
+      if (settings.prettyPrintJson !== undefined) document.getElementById('prettyPrintJson').checked = settings.prettyPrintJson;
+    }
+    
+    // Save settings to localStorage
+    function saveSettings() {
+      const settings = {
+        mcpEndpoint: document.getElementById('mcpEndpoint').value,
+        transactionsEndpoint: document.getElementById('transactionsEndpoint').value,
+        refreshRate: parseInt(document.getElementById('refreshRate').value),
+        prettyPrintJson: document.getElementById('prettyPrintJson').checked
+      };
+      localStorage.setItem('mcpDashboardSettings', JSON.stringify(settings));
+    }
+    
+    // Format JSON for display
+    function formatJson(json) {
+      const prettyPrint = document.getElementById('prettyPrintJson').checked;
+      if (prettyPrint) {
+        return JSON.stringify(json, null, 2);
+      } else {
+        return JSON.stringify(json);
+      }
+    }
+    
+    // Send MCP request
+    async function sendMcpRequest() {
+      const endpoint = document.getElementById('mcpEndpoint').value;
+      const query = document.getElementById('mcpQuery').value;
+      const contextText = document.getElementById('mcpContext').value;
+      
+      let context = {};
+      try {
+        if (contextText.trim()) {
+          context = JSON.parse(contextText);
+        }
+      } catch (error) {
+        alert('Invalid JSON in context field');
+        return;
+      }
+      
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query, context })
+        });
+        
+        const data = await response.json();
+        document.getElementById('mcpResponse').innerText = formatJson(data);
+        
+        // If successful, refresh transactions list
+        if (data.status === 'success' && data.conversation_context?.transaction_id) {
+          setTimeout(fetchTransactions, 500);
+        }
+      } catch (error) {
+        document.getElementById('mcpResponse').innerText = `Error: ${error.message}`;
+      }
+    }
+    
+    // Fetch transactions list
+    async function fetchTransactions() {
+      const endpoint = document.getElementById('transactionsEndpoint').value;
+      
+      try {
+        const response = await fetch(endpoint);
+        const data = await response.json();
+        
+        if (data.status === 'success' && Array.isArray(data.data)) {
+          const tbody = document.getElementById('transactionsList');
+          
+          if (data.data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center">No transactions found</td></tr>';
+            return;
+          }
+          
+          tbody.innerHTML = data.data.map(txn => `
+            <tr data-id="${txn.transaction_id}">
+              <td>${txn.transaction_id.substring(0, 10)}...</td>
+              <td>${txn.domain}</td>
+              <td><span class="badge bg-${getStateBadgeColor(txn.state)}">${txn.state}</span></td>
+              <td>${new Date(txn.timestamp).toLocaleString()}</td>
+              <td>${new Date(txn.timestamp).toLocaleString()}</td>
+              <td>
+                <button class="btn btn-sm btn-outline-primary view-transaction" data-id="${txn.transaction_id}">
+                  View
+                </button>
+              </td>
+            </tr>
+          `).join('');
+          
+          // Add event listeners
+          document.querySelectorAll('.view-transaction').forEach(btn => {
+            btn.addEventListener('click', () => viewTransaction(btn.dataset.id));
+          });
+        } else {
+          document.getElementById('transactionsList').innerHTML = 
+            '<tr><td colspan="6" class="text-center">Error fetching transactions</td></tr>';
+        }
+      } catch (error) {
+        document.getElementById('transactionsList').innerHTML = 
+          `<tr><td colspan="6" class="text-center">Error: ${error.message}</td></tr>`;
+      }
+    }
+    
+    // View transaction details
+    async function viewTransaction(id) {
+      const endpoint = `${document.getElementById('transactionsEndpoint').value}/${id}`;
+      
+      try {
+        const response = await fetch(endpoint);
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+          document.getElementById('transactionDetails').innerText = formatJson(data.data);
+          document.getElementById('modalTransactionDetails').innerText = formatJson(data.data);
+          
+          // Show modal
+          const modal = new bootstrap.Modal(document.getElementById('transactionModal'));
+          modal.show();
+        } else {
+          alert(`Error fetching transaction: ${data.message}`);
+        }
+      } catch (error) {
+        alert(`Error: ${error.message}`);
+      }
+    }
+    
+    // Helper function to get badge color based on state
+    function getStateBadgeColor(state) {
+      switch (state) {
+        case 'created': return 'secondary';
+        case 'search_completed': return 'info';
+        case 'selection_completed': return 'primary';
+        case 'initialization_completed': return 'warning';
+        case 'confirmation_completed': return 'success';
+        case 'cancelled': return 'danger';
+        case 'failed': return 'danger';
+        default: return 'secondary';
+      }
+    }
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      loadSettings();
+      
+      // Form submissions
+      document.getElementById('mcpForm').addEventListener('submit', e => {
+        e.preventDefault();
+        sendMcpRequest();
+      });
+      
+      document.getElementById('settingsForm').addEventListener('submit', e => {
+        e.preventDefault();
+        saveSettings();
+        alert('Settings saved');
+      });
+      
+      // Refresh transactions
+      document.getElementById('refreshTransactions').addEventListener('click', fetchTransactions);
+      
+      // Initial data fetch
+      fetchTransactions();
+      
+      // Set up auto-refresh
+      setInterval(() => {
+        const refreshRate = parseInt(document.getElementById('refreshRate').value);
+        if (refreshRate > 0 && document.getElementById('transactions').classList.contains('active')) {
+          fetchTransactions();
+        }
+      }, 1000);
+    });
+  </script>
+</body>
+</html>
